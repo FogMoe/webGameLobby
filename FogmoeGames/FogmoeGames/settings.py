@@ -26,20 +26,31 @@ SECRET_KEY = 'django-insecure-nxe7&vea)4p01l4&059fc$%8o6eslbf#i#e&0c584k(0xn4f)d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.0.0.225']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels', # channels应用
     'Models',
 ]
+ # 设置ASGI应用
+ASGI_APPLICATION = 'FogmoeGames.asgi.application'
+ 
+ # 设置通道层的通信后台 - 本地测试用
+CHANNEL_LAYERS = {
+    'default': {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

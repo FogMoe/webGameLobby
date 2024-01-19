@@ -18,9 +18,12 @@ def toLobbby(request):
     return render(request, 'lobby.html', context) 
 def toJoinroom(request):
     context          = {}
+    gameList = games.objects.all()
+    context['gameList'] = gameList 
     return render(request, 'joinroom.html', context) 
 def toCreateroom(request):
     context          = {}
     gameList = games.objects.all()
     context['gameList'] = gameList 
     return render(request, 'createroom.html', context) 
+

@@ -23,7 +23,7 @@
             选择游戏：
             <select name="game" >
                 {% for var in gameList %}
-                    <option value="{{ var.id }}">{{ var.name }} {{ var.playerNum }}人</option>
+                    <option value="{{ var.id }}">{{ var }}</option>
                 {% endfor %}
             </select><br/>
             房间密码：<input type="text" name="password"><br/>
