@@ -1,37 +1,74 @@
-from django.http import HttpResponse
 from django.shortcuts import render
-import datetime
-from django.contrib.auth.models import User #django自带的User模型
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as login_
-from django.contrib.auth import logout
-from Models.models import games,ChatMessage,ChatRoom
-from django.shortcuts import redirect
-import re
+from Models.models import games,ChatRoom
+from django.core.exceptions import ObjectDoesNotExist
 
 def createroom(request):
     context          = {}
-    gameId = request.POST['game']
-    roomName=games.objects.get(id=gameId).__str__()
+    gameId = int(request.POST['game'])##获取游戏id
     password = request.POST['password']
-    user=request.user
-    chatRoom=ChatRoom(name=roomName,password=password)
-
-    chatRoom.save()
-    chatRoom.subscribers.add(user)
-    context['roomId'] = chatRoom.id
+    roomName=games.objects.get(id=gameId).__str__()
     context['roomName'] = roomName
 
-    return render(request, 'chatroom.html', context)
+    match gameId:
+        case 1:##100人聊天室
+            user=request.user
+            chatRoom=ChatRoom(name=roomName,password=password) ##创建游戏模型
+            chatRoom.save()
+            context['roomId'] = chatRoom.id##获取房间id
+            return render(request, 'chatroom.html', context)
+            
+        case 2:##狼人杀
+            return render(request, 'index.html', context)
+        case _:
+            return render(request, 'createroom.html', context)
+
+
 def joinroom(request):
     context          = {}
-    gameId = request.POST['game']
+    gameId = int(request.POST['game'])
     roomName=games.objects.get(id=gameId).__str__()
     roomId=request.POST['roomId']
     password = request.POST['password']
     user=request.user
-    chatRoom=ChatRoom.objects.get(id=roomId) 
-    chatRoom.subscribers.add(user)
     context['roomId'] = roomId
     context['roomName'] = roomName
-    return render(request, 'chatroom.html', context)
+    print(roomId)
+    print("阿斯蒂芬更健康了")
+    if roomId=='':##如果房间号空着
+        context['message'] = '房间号不要空着啊啊'
+        gameList = games.objects.all()
+        context['gameList'] = gameList 
+        return render(request, 'joinroom.html', context) 
+    match gameId:
+        case 1:
+            try:
+                chatRoom=ChatRoom.objects.get(id=roomId) ##获取游戏对象
+            except ObjectDoesNotExist: ##如果没有根据id获取到对象，说明这个房间不存在
+                context['message'] = '没有这个房间！'
+                gameList = games.objects.all()
+                context['gameList'] = gameList 
+                return render(request, 'joinroom.html', context) 
+            else:
+                if chatRoom.password == password: 
+                    print('aaaa')
+                    try:##判断是不是已经在房间里了
+                        chatRoom.subscribers.get(id=user.id)
+                    except ObjectDoesNotExist:
+                        return render(request, 'chatroom.html', context)
+                    else:
+                        context['message'] = '你已经在这个房间里了！'
+                        gameList = games.objects.all()
+                        context['gameList'] = gameList 
+                        return render(request, 'joinroom.html', context) 
+                    
+                else:##密码错误时
+                    context['message'] = '密码错误！'
+                    gameList = games.objects.all()
+                    context['gameList'] = gameList 
+                    return render(request, 'joinroom.html', context) 
+        case 2:##狼人杀
+            return render(request, 'index.html', context)
+        case _:
+            print('没有这个游戏')
+            return render(request, 'joinroom.html', context)
+
