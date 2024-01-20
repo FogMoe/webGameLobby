@@ -9,6 +9,7 @@ def dingshishanchuroom(room,shijian):
     # 启动线程
     thread.start()
 
+##如果房间没人，则删除房间
 def deleteroom(room ):
     if not(room.subscribers.all().exists()):
         print('这个房间没人了，删除房间')
@@ -32,7 +33,7 @@ def createroom(request):
             chatRoom=ChatRoom(name=roomName,password=password) ##创建游戏模型
             chatRoom.save()
             context['roomId'] = chatRoom.id##获取房间id
-            dingshishanchuroom(chatRoom,120)
+            dingshishanchuroom(chatRoom,120)##120秒没人加入时删除这个房间
             return render(request, 'joinroom.html', context)
             
         case 2:##狼人杀
