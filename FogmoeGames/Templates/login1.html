@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>雾萌游戏</title>
+</head>
+<body>
+
+    <div name="top">
+        雾萌游戏 
+        {% if user.username   %}
+            {{ user.username }} <a href="/unLogin/"  method="get">退出</a>
+        {% else %}
+            <a href="/toLogin/"  method="get">登录</a>/<a href="/toRegister/"  method="get">注册</a>
+        {% endif %}
+        <a href="/index/"  method="get">首页</a>
+    </div>
+
+    <div name="centre">
+        <form action="/login/" method="post">
+            {% csrf_token %}
+            用户名：<input type="text" name="username"><br/>
+            密码码：<input type="text" name="password"><br/>
+            <input type="submit" value="登录">
+        </form>
+        <p>{{ message }}</p>
+    </div>
+
+    <div name="bottom">
+    </div>
+
+</body>
+</html>
