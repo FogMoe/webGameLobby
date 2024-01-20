@@ -1,6 +1,20 @@
+import threading,time
 from django.shortcuts import render
 from Models.models import games,ChatRoom
 from django.core.exceptions import ObjectDoesNotExist
+
+def dingshishanchuroom(room,shijian):
+    # 创建一个线程，目标函数是 delayed_execution
+    thread = threading.Thread(target=lambda: [time.sleep(shijian), deleteroom(room)])
+    # 启动线程
+    thread.start()
+
+def deleteroom(room ):
+    if not(room.subscribers.all().exists()):
+        print('这个房间没人了，删除房间')
+        print(room)
+        room.delete()
+        print('这个房间没人加入，不如我们鲨了它吧')
 
 def createroom(request):
     context          = {}
@@ -8,6 +22,9 @@ def createroom(request):
     password = request.POST['password']
     roomName=games.objects.get(id=gameId).__str__()
     context['roomName'] = roomName
+    context['gameId'] = gameId
+    gameList = games.objects.all()
+    context['gameList'] = gameList
 
     match gameId:
         case 1:##100人聊天室
@@ -15,7 +32,8 @@ def createroom(request):
             chatRoom=ChatRoom(name=roomName,password=password) ##创建游戏模型
             chatRoom.save()
             context['roomId'] = chatRoom.id##获取房间id
-            return render(request, 'chatroom.html', context)
+            dingshishanchuroom(chatRoom,120)
+            return render(request, 'joinroom.html', context)
             
         case 2:##狼人杀
             return render(request, 'index.html', context)
