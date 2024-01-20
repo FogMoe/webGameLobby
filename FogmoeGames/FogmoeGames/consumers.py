@@ -28,43 +28,80 @@ class ChatConsumer(WebsocketConsumer):
         # 从url里获取聊天室名字，为每个房间建立一个频道组
         self.roomId = self.scope['url_route']['kwargs']['roomId']
         self.room_group_name = 'chat_%s' % self.roomId
-        self.room=ChatRoom.objects.get(id=self.roomId)##获取房间对象
-        self.user=self.scope['user']##获取用户对象
-
-        self.room.subscribers.add(self.user) ##房间添加玩家
+ 
+        room=ChatRoom.objects.get(id=self.roomId)##获取房间对象
+        user=self.scope['user']##获取用户对象
+        room.subscribers.add(user) ##房间添加玩家
 
         # 将当前频道加入频道组
         async_to_sync(self.channel_layer.group_add)(
-           self.room_group_name,
+            self.room_group_name,
             self.channel_name
         )
+        
 
         # 接受所有websocket请求
         self.accept()
+
+        # 加入房间的消息
+        message=str(user.username)+'加入了房间！'
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message
+            }
+        )
+        # 同步玩家列表
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'onlinelist_message'
+            }
+        )
 
     # websocket断开时执行方法
     def disconnect(self, close_code):
         print('websocket断开时执行方法')
 
-
-        self.room.subscribers.remove(self.user) ##房间删除玩家
+        room=ChatRoom.objects.get(id=self.roomId)##获取房间对象
+        user=self.scope['user']##获取用户对象
+        room.subscribers.remove(user) ##房间删除玩家
         ##房间无人时删除房间
-        if not(self.room.subscribers.all().exists()):
+        if not(room.subscribers.all().exists()):
             print('这个房间没人了，删除房间')
-            print(self.room)
-            self.room.delete()
+            print(room)
+            room.delete()
 
+        # 退出房间的消息
+        message=str(user.username)+'失踪了。┭┮﹏┭┮'
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message
+            }
+        )
+        # 同步玩家列表
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'onlinelist_message'
+            }
+        )
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
 
+
     # 从websocket接收到消息时执行函数
     def receive(self, text_data):
         print("# 从websocket接收到消息时执行函数")
         text_data_json = json.loads(text_data)
-
-        message = self.user.username+" : "+text_data_json['message']
+        room=ChatRoom.objects.get(id=self.roomId)##获取房间对象
+        user=self.scope['user']##获取用户对象
+        message = user.username+" : "+text_data_json['message']
 
         # 发送消息到频道组，频道组调用chat_message方法
         async_to_sync(self.channel_layer.group_send)(
@@ -84,3 +121,14 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': f'({datetime_str}) {message}'
         }))
+
+    # 同步在线列表的方法
+    def onlinelist_message(self, event):
+        room=ChatRoom.objects.get(id=self.roomId)
+        onlinelist = room.subscribers.all()
+
+        # 通过websocket发送消息到客户端
+        self.send(text_data=json.dumps({
+            'onlinelist': f'{onlinelist}'
+        }))
+

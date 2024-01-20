@@ -19,9 +19,10 @@
     <div name="centre">
         <textarea id="chat-log" cols="100" rows="20"></textarea><br>
         <input id="chat-message-input" type="text" size="100"><br>
-        <input id="chat-message-submit" type="button" value="Send">
-        {{ roomId|json_script:"roomId" }}
+        <input id="chat-message-submit" type="button" value="Send"><br>
+        <textarea id="online-list" cols="100" rows="20"></textarea><br>
         <p>{{ roomName }}{{ roomId }}</p>
+        {{ roomId|json_script:"roomId" }}
     </div>
 
     <div name="bottom">
@@ -40,14 +41,19 @@
  
         // 建立websocket连接时触发此方法，展示欢迎提示
         chatSocket.onopen = function(e) {
-             document.querySelector('#chat-log').value += ('[公告]欢迎来到' + roomId + '讨论群。请文明发言!\n')
+             document.querySelector('#chat-log').value += ('[公告]' + roomId + '号房间连接成功~\n')
          }
  
         // 从后台接收到数据时触发此方法
         // 接收到后台数据后对其解析，并加入到聊天记录chat-log
          chatSocket.onmessage = function(e) {
              const data = JSON.parse(e.data);
-             document.querySelector('#chat-log').value += (data.message + '\n');
+             if ( data.message != undefined ){
+                document.querySelector('#chat-log').value += (data.message + '\n');
+             }
+             if ( data.onlinelist != undefined ){
+                document.querySelector('#online-list').value = (data.onlinelist + '\n');
+             }
          };
  
          // websocket连接断开时触发此方法
