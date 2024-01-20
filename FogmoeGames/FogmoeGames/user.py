@@ -11,22 +11,17 @@ def validate_user_input(username, password, email):
     # 用户名不允许包含特定的不常见符号（黑名单）
     if re.search(r'[<>{}[\]~`]', username):
         return False
-
     # 用户名长度不超过8位
     if len(username) > 8:
         return False
-    
     if len(username) < 2:
         return False
-
     # 密码必须6位以上12位以下，可以包含字母、数字和符号
     if not re.match(r'^[A-Za-z0-9@#$%^&+=]{6,12}$', password):
         return False
-
     # 电子邮件格式校验
     if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
         return False
-
     return True
 
 def login(request):

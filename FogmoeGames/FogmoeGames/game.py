@@ -25,10 +25,10 @@ def createroom(request):
     context['gameId'] = gameId
     gameList = games.objects.all()
     context['gameList'] = gameList
+    context['password'] = password
 
     match gameId:
         case 1:##100人聊天室
-            user=request.user
             chatRoom=ChatRoom(name=roomName,password=password) ##创建游戏模型
             chatRoom.save()
             context['roomId'] = chatRoom.id##获取房间id

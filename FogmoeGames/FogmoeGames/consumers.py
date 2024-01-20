@@ -125,7 +125,9 @@ class ChatConsumer(WebsocketConsumer):
     # 同步在线列表的方法
     def onlinelist_message(self, event):
         room=ChatRoom.objects.get(id=self.roomId)
-        onlinelist = room.subscribers.all()
+        onlinelist=''
+        for user in room.subscribers.all():
+            onlinelist += user.username + '\n'
 
         # 通过websocket发送消息到客户端
         self.send(text_data=json.dumps({
