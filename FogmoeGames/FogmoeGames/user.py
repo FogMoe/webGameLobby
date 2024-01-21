@@ -68,4 +68,3 @@ def unLogin(request):
     logout(request)
     context['message'] = '已退出登录' 
     return  redirect('index') #重定向到index
-    #return HttpResponse("Hello world ! ")

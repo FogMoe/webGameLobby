@@ -170,7 +170,7 @@ class WerewolfSagaConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type': 'onlinelist_message'
+                'type': 'info_message'
             }
         )
 
@@ -199,7 +199,7 @@ class WerewolfSagaConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type': 'onlinelist_message'
+                'type': 'info_message'
             }
         )
         async_to_sync(self.channel_layer.group_discard)(
@@ -214,7 +214,37 @@ class WerewolfSagaConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         room=WerewolfSaga.objects.get(id=self.roomId)##获取房间对象
         user=self.scope['user']##获取用户对象
+        player=WerewolfSagaPlayer.objects.get(player__id=user.id,werewolfsaga_id=self.roomId)
+        roomUsers=room.players.all()
+        roomPlayer=WerewolfSagaPlayer.objects.filter(werewolfsaga_id=self.roomId)
+            
         message = user.username+" : "+text_data_json['message']
+        
+        ##回合0
+        if room.round == 0:
+            if text_data_json['message'] == 'unready':
+                player.playerstatus = 0
+                player.save()
+
+            if text_data_json['message'] == 'ready':
+                player.playerstatus = 1
+                player.save()
+                ##每有人准备时 判断房间中所有人是否准备
+                r=True
+                for p in roomPlayer:
+                    if p.playerstatus == 0:r=False
+                if r:
+                    room.round = 1
+                    room.save()
+
+
+        
+        if room.round == 1:
+            i=0
+            for p in roomPlayer:
+                i+=1
+                p.playernumber = i
+                p.save()
 
         # 发送消息到频道组，频道组调用chat_message方法
         async_to_sync(self.channel_layer.group_send)(
@@ -225,10 +255,19 @@ class WerewolfSagaConsumer(WebsocketConsumer):
             }
         )
 
+        # 同步玩家列表
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'info_message'
+            }
+        )
+
     # 从频道组接收到消息后执行方法
     def chat_message(self, event):
         message = event['message']
         datetime_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
 
         # 通过websocket发送消息到客户端
         self.send(text_data=json.dumps({
@@ -236,19 +275,27 @@ class WerewolfSagaConsumer(WebsocketConsumer):
         }))
 
     # 同步在线列表的方法
-    def onlinelist_message(self, event):
+    def info_message(self, event):
         room=WerewolfSaga.objects.get(id=self.roomId)
+        user=self.scope['user']
+        player=WerewolfSagaPlayer.objects.get(player__id=user.id,werewolfsaga_id=self.roomId)
+        playerstatus=player.playerstatus
+        role=player.role
+        playernumber=player.playernumber
+        username=user.username
+        round=room.round
+        action=room.action
         onlinelist=''
-        for user in room.players.all():
-            player=WerewolfSagaPlayer.objects.get(player__id=user.id)
-            playerstatus='状态'
+        for u in room.players.all():
+            player=WerewolfSagaPlayer.objects.get(player__id=u.id,werewolfsaga_id=self.roomId)
+            ps='状态'
             match player.playerstatus:
                 case 0:
-                    playerstatus='未准备'
+                    ps='未准备'
                 case 1:
-                    playerstatus='准备'
+                    ps='准备'
                 case 2:
-                    playerstatus='死了'
+                    ps='死了'
             role='角色'
             match player.role:
                 case 0:
@@ -257,10 +304,17 @@ class WerewolfSagaConsumer(WebsocketConsumer):
                     role='狼人'
                 case 2:
                     role='女巫'
-            onlinelist += user.username +' ('+playerstatus+') '+role+  '\n'
+            onlinelist += str(player.playernumber) +'. '+ u.username +' ('+ps+') '+role+  '\n'
 
         # 通过websocket发送消息到客户端
         self.send(text_data=json.dumps({
-            'onlinelist': f'{player.playernumber}. {onlinelist}'
+            'onlinelist': f'{onlinelist}',
+            'role': f'{str(role)}',
+            'playernumber': f'{str(playernumber)}',
+            'username': f'{str(username)}',
+            'round': f'{str(round)}',
+            'playerstatus': f'{str(playerstatus)}',
+            'action': f'{str(action)}'
         }))
+
 

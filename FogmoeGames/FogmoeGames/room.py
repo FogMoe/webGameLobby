@@ -10,7 +10,7 @@ def dingshishanchuroom(room,shijian):
 
 ##如果房间没人，则删除房间
 def deleteroom(room ):
-    if not(room.subscribers.all().exists()):
+    if not(room.players.all().exists()):
         print('这个房间没人了，删除房间')
         print(room)
         room.delete()
@@ -79,7 +79,7 @@ def joinroom(request):
                 context['gameList'] = gameList 
                 return render(request, 'joinroom.html', context) 
             
-            if ChatRoom.objects.filter(id=roomId,subscribers__id=user.id).exists():
+            if ChatRoom.objects.filter(id=roomId,players__id=user.id).exists():
                 context['message'] = '你已经在这个房间里了！'
                 gameList = games.objects.all()
                 context['gameList'] = gameList 

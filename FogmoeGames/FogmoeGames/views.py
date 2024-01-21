@@ -3,9 +3,7 @@ from Models.models import games
  
 def index(request):
     context          = {}
-    context['hello'] = 'Hello Index!' #对html中传递hello变量
     return render(request, 'index.html', context) #对html跳转到index
-    #return HttpResponse("Hello world ! ")
 def toLogin(request):
     context          = {}
     return render(request, 'login.html', context) 

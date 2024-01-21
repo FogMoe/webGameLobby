@@ -20,6 +20,13 @@
         <textarea id="chat-log" cols="100" rows="20"></textarea><br>
         <input id="chat-message-input" type="text" size="100"><br>
         <input id="chat-message-submit" type="button" value="Send"><br>
+
+        <div style="display:none" id="round0">
+            <input id="ready" type="button" value="ready">
+            <input id="unready" style="display:none" type="button" value="unready">
+        </div>
+
+        
         <textarea id="online-list" cols="100" rows="20"></textarea><br>
         <p>{{ roomName }}{{ roomId }}</p>
         {{ roomId|json_script:"roomId" }}
@@ -45,14 +52,31 @@
          }
  
         // 从后台接收到数据时触发此方法
-        // 接收到后台数据后对其解析，并加入到聊天记录chat-log
          chatSocket.onmessage = function(e) {
              const data = JSON.parse(e.data);
+             //把聊天信息message推送到id为chat-log的控件
              if ( data.message != undefined ){
                 document.querySelector('#chat-log').value += (data.message + '\n');
              }
+             //把在线列表onlinelist推送到id为online-list的控件
              if ( data.onlinelist != undefined ){
                 document.querySelector('#online-list').value = (data.onlinelist);
+             }
+             //rond0没有开始游戏时玩家可以看到的内容
+             if( data.round == 0){
+                document.querySelector('#round0').style.display = 'block';
+             }else{
+                document.querySelector('#round0').style.display = 'none';
+             }
+             //如果用户没有准备则给准备按钮
+             if ( data.playerstatus == 0 ){
+                document.querySelector('#ready').style.display = 'block';
+                document.querySelector('#unready').style.display = 'none';
+             }
+             //如果用户没有准备则给准备按钮
+             if ( data.playerstatus == 1 ){
+                document.querySelector('#ready').style.display = 'none';
+                document.querySelector('#unready').style.display = 'block';
              }
          };
  
@@ -72,6 +96,30 @@
          document.querySelector('#chat-message-submit').onclick = function(e) {
              const messageInputDom = document.querySelector('#chat-message-input');
              const message = messageInputDom.value;
+             
+             //注意这里:先把文本数据转成json格式,然后调用send方法发送。
+             chatSocket.send(JSON.stringify({
+                 'message': message
+             }));
+             messageInputDom.value = '';
+         };
+
+        // 点击ready时。
+         document.querySelector('#ready').onclick = function(e) {
+             const messageInputDom = document.querySelector('#chat-message-input');
+             const message = 'ready';
+             
+             //注意这里:先把文本数据转成json格式,然后调用send方法发送。
+             chatSocket.send(JSON.stringify({
+                 'message': message
+             }));
+             messageInputDom.value = '';
+         };
+
+        // 点击unready时。
+         document.querySelector('#unready').onclick = function(e) {
+             const messageInputDom = document.querySelector('#chat-message-input');
+             const message = 'unready';
              
              //注意这里:先把文本数据转成json格式,然后调用send方法发送。
              chatSocket.send(JSON.stringify({

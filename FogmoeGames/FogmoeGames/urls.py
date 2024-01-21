@@ -31,5 +31,6 @@ urlpatterns = [
     path('unLogin/', user.unLogin, name='unLogin'),
     path('createroom/', room.createroom, name='createroom'),
     path('joinroom/', room.joinroom, name='joinroom'),
-    path('index/', views.index,name='index'),
+    path('index/', views.index),
+    path('', views.index,name='index'),
 ]
