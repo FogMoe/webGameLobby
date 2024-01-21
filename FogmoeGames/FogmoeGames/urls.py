@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from . import views,user,testdb,game
+from . import room, views,user,testdb
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,8 +29,8 @@ urlpatterns = [
     path('login/', user.login, name='login'),
     path('register/', user.register, name= 'register'),
     path('unLogin/', user.unLogin, name='unLogin'),
-    path('createroom/', game.createroom, name='createroom'),
-    path('joinroom/', game.joinroom, name='joinroom'),
+    path('createroom/', room.createroom, name='createroom'),
+    path('joinroom/', room.joinroom, name='joinroom'),
     path('', views.index),
     path('index/', views.index,name='index'),
     path('testdb/', testdb.testdb),

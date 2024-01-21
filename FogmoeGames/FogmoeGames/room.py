@@ -1,5 +1,5 @@
 import threading,time
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from Models.models import games,ChatRoom
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -29,15 +29,17 @@ def createroom(request):
     context['password'] = password
 
     match gameId:
-        case 1:##100人聊天室
+        case 1:
+            ##---------------聊天室--------------
             chatRoom=ChatRoom(name=roomName,password=password) ##创建游戏模型
             chatRoom.save()
             context['roomId'] = chatRoom.id##获取房间id
-            dingshishanchuroom(chatRoom,120)##创建房间120s后没人的话就删除房间
+            dingshishanchuroom(chatRoom,60)##创建房间120s后没人的话就删除房间
             return render(request, 'joinroom.html', context)
             
-        case 2:##狼人杀
-            return render(request, 'index.html', context)
+        case 2:
+            ##---------------狼人杀--------------
+            return  redirect('index') #重定向到index
         case _:
             return render(request, 'createroom.html', context)
 
@@ -60,11 +62,13 @@ def joinroom(request):
         return render(request, 'joinroom.html', context) 
     match gameId:
         case 1:
+            ##---------------聊天室--------------
             if not ChatRoom.objects.filter(id=roomId).exists():##如果房间不存在
                 context['message'] = '没有这个房间！'
                 gameList = games.objects.all()
                 context['gameList'] = gameList 
                 return render(request, 'joinroom.html', context) 
+            
             chatRoom=ChatRoom.objects.get(id=roomId)
             if not chatRoom.password == password: 
                 context['message'] = '密码错误！'
@@ -72,7 +76,7 @@ def joinroom(request):
                 context['gameList'] = gameList 
                 return render(request, 'joinroom.html', context) 
             
-            if ChatRoom.objects.filter(subscribers__id=user.id).exists():
+            if ChatRoom.objects.filter(id=roomId,subscribers__id=user.id).exists():
                 context['message'] = '你已经在这个房间里了！'
                 gameList = games.objects.all()
                 context['gameList'] = gameList 
@@ -80,8 +84,9 @@ def joinroom(request):
          
             return render(request, 'chatroom.html', context)
             
-        case 2:##狼人杀
-            return render(request, 'index.html', context)
+        ##---------------狼人杀--------------
+        case 2:
+            return  redirect('index') #重定向到index
         case _:
             print('没有这个游戏')
             return render(request, 'joinroom.html', context)

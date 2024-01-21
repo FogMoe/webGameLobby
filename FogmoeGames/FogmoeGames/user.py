@@ -31,7 +31,7 @@ def login(request):
 
     if not user:
         context['message'] = '用户名或密码错误~' 
-        return render(request, 'login.html', context) #对html跳转到index
+        return render(request, 'login.html', context) 
     
     user.last_login=datetime.datetime.now()
     context['message'] = '登录成功~' 
@@ -49,11 +49,11 @@ def register(request):
 
     if not validate_user_input(username,password,email):
         context['message'] = '输入错误，请检查~' 
-        return render(request,'register.html', context) #对html跳转到index
+        return render(request,'register.html', context) 
     
     if User.objects.filter(username=username).exists():
         context['message'] = '用户名已存在~' 
-        return render(request,'register.html', context) #对html跳转到index
+        return render(request,'register.html', context) 
     
     last_login = datetime.datetime.now()
     user=User.objects.create_user(username=username,password=password,email=email,last_login=last_login)
