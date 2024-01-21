@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>雾萌游戏</title>
+</head>
+<body>
+
+    <div name="top">
+        雾萌游戏 
+        {% if user.username   %}
+            {{ user.username }} <a href="/unLogin/"  method="get">退出</a>
+        {% else %}
+            <a href="/toLogin/"  method="get">登录</a>/<a href="/toRegister/"  method="get">注册</a>
+        {% endif %}
+        <a href="/index/"  method="get">首页</a>
+    </div>
+
+    <div name="centre">
+        <p>这里是大厅</p>
+        <a href="/toJoinroom/"  method="get">加入房间</a>/<a href="/toCreateroom/"  method="get">创建房间</a>
+    </div>
+
+    <div name="bottom">
+        {{ hello }}
+    </div>
+
+</body>
+</html>

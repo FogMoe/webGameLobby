@@ -1,35 +1,56 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>雾萌游戏</title>
-</head>
-<body>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>雾萌游戏 - 注册</title>
 
-    <div name="top">
-        雾萌游戏 
-        {% if user.username   %}
-            {{ user.username }} <a href="/unLogin/"  method="get">退出</a>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sign-in/" />
+
+    <link href="{% static 'assets/dist/css/bootstrap.min.css' %}" rel="stylesheet" />
+
+    <link href="{% static 'assets/dist/css/sign-in.css' %}" rel="stylesheet" />
+  </head>
+  <body class="text-center">
+    <main class="form-signin w-100 m-auto">
+      <!-- <img class="mb-4" src="{% static 'assets/brand/bootstrap-logo.svg' %}" alt="" width="72" height="57" /> -->
+      <h1 class="h3 mb-3 fw-normal">雾萌游戏</h1>
+      <p>用户名2~8位，密码6~12位。</p>
+
+      <form action="/register/" method="post">
+        {% csrf_token %}
+
+        {% if user.username %}
+          <!-- 已登录 -->
+          <a href="/unLogin/" class="w-100 btn btn-lg btn-primary">退出登录</a>
+          <hr class="my-4" />
+          <a href="/index/" class="w-100 btn btn-lg btn-primary">首页</a>
         {% else %}
-            <a href="/toLogin/"  method="get">登录</a>/<a href="/toRegister/"  method="get">注册</a>
+          <!-- 未登录 -->
+          <div class="form-floating">
+            <input type="email" class="form-control" name="email" id="floatingInput" placeholder="name@example.com" />
+            <label for="floatingInput">邮箱</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control" name="username" id="floatingInput" placeholder="" />
+            <label for="floatingInput">用户名</label>
+          </div>
+
+          <div class="form-floating">
+            <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password" />
+            <label for="floatingPassword">密码</label>
+          </div>
+
+          <input type="submit" class="w-100 btn btn-lg btn-primary" value="注册" />
+          <p class="text-danger">{{ message }}</p>
+          <hr class="my-4" />
+          <p>已有账号？</p>
+          <a href="/toLogin/" class="w-100 btn btn-lg btn-primary">登录</a>
         {% endif %}
-        <a href="/index/"  method="get">首页</a>
-    </div>
+      </form>
 
-    <div name="centre">
-        <form action="/register/" method="post">
-            {% csrf_token %}
-            用户名：<input type="text" name="username"><br/>
-            密码码：<input type="text" name="password"><br/>
-            邮箱箱：<input type="text" name="email"><br/>
-            <input type="submit" value="注册">
-        </form>
-        
-        <p>{{ message }}</p>
-    </div>
-
-    <div name="bottom">
-    </div>
-
-</body>
+      <p class="mt-5 mb-3 text-muted">&copy; COPYRIGHT 2024 FOGMOE</p>
+    </main>
+  </body>
 </html>

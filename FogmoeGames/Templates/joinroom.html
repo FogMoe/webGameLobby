@@ -1,42 +1,59 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-<meta charset="utf-8">
-<title>雾萌游戏</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>雾萌游戏 - 加入房间</title>
+    <link href="{% static 'assets/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/dist/css/sign-in.css' %}" rel="stylesheet">
 </head>
-<body>
+<body class="text-center">
 
-    <div name="top">
-        雾萌游戏 
-        {% if user.username   %}
-            {{ user.username }} <a href="/unLogin/"  method="get">退出</a>
+<main class="form-signin w-100 m-auto">
+    <h1 class="h3 mb-3 fw-normal">雾萌游戏</h1>
+    <div>
+        {% if user.username %}
+            <p>欢迎, {{ user.username }}!</p>
+            <a href="/unLogin/" class="w-100 btn btn-lg btn-primary">退出</a>
         {% else %}
-            <a href="/toLogin/"  method="get">登录</a>/<a href="/toRegister/"  method="get">注册</a>
+            <a href="/toLogin/" class="w-100 btn btn-lg btn-primary">登录</a>
+            <p></p>
+            <a href="/toRegister/" class="w-100 btn btn-lg btn-primary">注册</a>
         {% endif %}
-        <a href="/index/"  method="get">首页</a>
+        <p></p>
+        <a href="/index/" class="w-100 btn btn-lg btn-primary">返回首页</a>
     </div>
-
-    <div name="centre">
-        <p>加入房间</p>
-        <form action="/joinroom/" method="post">
-            {% csrf_token %}
-            选择游戏：
-            <select name="game" >
+    <hr class="my-4">
+    <p>加入房间</p>
+    <form action="/joinroom/" method="post">
+        {% csrf_token %}
+        <div class="form-floating">
+            <select name="game" class="form-control">
                 {% for var in gameList %}
-                    <option value="{{ var.id }}" {% if var.id == gameId   %} selected {% endif %}>{{ var }}</option>
+                    <option value="{{ var.id }}" {% if var.id == gameId %} selected {% endif %}>{{ var }}</option>
                 {% endfor %}
-            </select><br/>
-            房间号喵：<input value="{{ roomId }}" type="text" name="roomId"><br/>
-            房间密码：<input value="{{ password }}" type="text" name="password"><br/>
-            <input type="submit" value="进入">
-        </form>
+            </select>
+            <label for="game">选择游戏</label>
+        </div>
 
-        <p>{{ message }}</p>
-    </div>
+        <div class="form-floating">
+            <input type="text" name="roomId" class="form-control" value="{{ roomId }}" placeholder="房间号喵">
+            <label for="roomId">房间号</label>
+        </div>
 
-    <div name="bottom">
-        {{ hello }}
-    </div>
+        <div class="form-floating">
+            <input type="password" name="password" class="form-control" value="{{ password }}" placeholder="房间密码">
+            <label for="password">房间密码</label>
+        </div>
+
+        <button class="w-100 btn btn-lg btn-primary" type="submit">进入</button>
+        <p></p>
+        <a href="/toCreateroom/" class="w-100 btn btn-lg btn-primary">创建房间</a>
+        <p class="text-danger">{{ message }}</p>
+    </form>
+    <p class="mt-5 mb-3 text-muted">&copy; COPYRIGHT 2024 FOGMOE</p>
+</main>
 
 </body>
 </html>
