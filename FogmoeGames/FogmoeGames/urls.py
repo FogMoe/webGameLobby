@@ -16,14 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from . import room, views,user,testdb
+from . import room, views,user
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('toLogin/', views.toLogin),
-    path('toRegister/', views.toRegister),
-    path('toLobby/', views.toLobbby),
-    path('toLobby/', views.toLobbby),
+    path('admin/', admin.site.urls, name='admin'),
+    path('toLogin/', views.toLogin, name='toLogin'),
+    path('toRegister/', views.toRegister, name='toRegister'),
+    path('toLobby/', views.toLobbby, name='toLobby'),
+    path('toLobby/', views.toLobbby, name='toLobby'),
     path('toJoinroom/', views.toJoinroom, name='toJoinroom'),
     path('toCreateroom/', views.toCreateroom, name='toCreateroom'),
     path('login/', user.login, name='login'),
@@ -31,8 +31,5 @@ urlpatterns = [
     path('unLogin/', user.unLogin, name='unLogin'),
     path('createroom/', room.createroom, name='createroom'),
     path('joinroom/', room.joinroom, name='joinroom'),
-    path('', views.index),
     path('index/', views.index,name='index'),
-    path('testdb/', testdb.testdb),
-    #path("", views.hello, name="hello"),
 ]

@@ -1,9 +1,6 @@
 from django.db import models
 from django.core.validators import validate_comma_separated_integer_list
 from django.contrib.auth.models import User
-# Create your models here.
-class Test(models.Model):
-    name = models.CharField(max_length=20)
 class games(models.Model):
     name = models.CharField(max_length=40)
     playerNum = models.IntegerField()
@@ -16,7 +13,7 @@ class games(models.Model):
 class ChatRoom(models.Model):
     name = models.CharField(max_length=255)
     password = models.CharField(max_length=255, null=True, blank=True)
-    subscribers = models.ManyToManyField(User, related_name="chatrooms", blank=True)
+    subscribers = models.ManyToManyField(User, related_name="chatrooms", blank=True)##玩家
 
     def __str__(self):
         return f"{self.name}"
@@ -30,3 +27,28 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.sender.username} : {self.content}"
+    
+
+# 狼人杀
+class WerewolfSaga(models.Model):
+    name = models.CharField(max_length=255)
+    password = models.CharField(max_length=255, null=True, blank=True)
+    round = models.IntegerField(default=0)
+    action = models.IntegerField(default=0)
+    players = models.ManyToManyField(User, through='WerewolfSagaPlayer',blank=True)##玩家
+
+
+
+    def __str__(self):
+        return f"{self.name}"
+    
+class WerewolfSagaPlayer(models.Model):
+    # 中间表模型
+    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    werewolfsaga = models.ForeignKey(WerewolfSaga, on_delete=models.CASCADE)
+    playerstatus = models.IntegerField(default=0)
+    playernumber = models.IntegerField(default=0)
+    role = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.playernumber} : {self.player.username}"

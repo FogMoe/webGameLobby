@@ -1,7 +1,6 @@
 import threading,time
 from django.shortcuts import redirect, render
-from Models.models import games,ChatRoom
-from django.core.exceptions import ObjectDoesNotExist
+from Models.models import games,ChatRoom,WerewolfSaga,WerewolfSagaPlayer
 
 def dingshishanchuroom(room,shijian):
     # 创建一个线程，目标函数是 delayed_execution
@@ -31,15 +30,19 @@ def createroom(request):
     match gameId:
         case 1:
             ##---------------聊天室--------------
-            chatRoom=ChatRoom(name=roomName,password=password) ##创建游戏模型
-            chatRoom.save()
-            context['roomId'] = chatRoom.id##获取房间id
-            dingshishanchuroom(chatRoom,60)##创建房间120s后没人的话就删除房间
+            room=ChatRoom(name=roomName,password=password) ##创建游戏模型
+            room.save()
+            context['roomId'] = room.id##获取房间id
+            dingshishanchuroom(room,60)##创建房间120s后没人的话就删除房间
             return render(request, 'joinroom.html', context)
             
         case 2:
             ##---------------狼人杀--------------
-            return  redirect('index') #重定向到index
+            room=WerewolfSaga(name=roomName,password=password) ##创建游戏模型
+            room.save()
+            context['roomId'] = room.id##获取房间id
+            dingshishanchuroom(room,60)##创建房间120s后没人的话就删除房间
+            return render(request, 'joinroom.html', context)
         case _:
             return render(request, 'createroom.html', context)
 
@@ -69,8 +72,8 @@ def joinroom(request):
                 context['gameList'] = gameList 
                 return render(request, 'joinroom.html', context) 
             
-            chatRoom=ChatRoom.objects.get(id=roomId)
-            if not chatRoom.password == password: 
+            room=ChatRoom.objects.get(id=roomId)
+            if not room.password == password: 
                 context['message'] = '密码错误！'
                 gameList = games.objects.all()
                 context['gameList'] = gameList 
@@ -84,9 +87,29 @@ def joinroom(request):
          
             return render(request, 'chatroom.html', context)
             
-        ##---------------狼人杀--------------
+
         case 2:
-            return  redirect('index') #重定向到index
+            ##---------------狼人杀--------------
+            if not WerewolfSaga.objects.filter(id=roomId).exists():##如果房间不存在
+                context['message'] = '没有这个房间！'
+                gameList = games.objects.all()
+                context['gameList'] = gameList 
+                return render(request, 'joinroom.html', context) 
+            
+            room=WerewolfSaga.objects.get(id=roomId)
+            if not room.password == password: 
+                context['message'] = '密码错误！'
+                gameList = games.objects.all()
+                context['gameList'] = gameList 
+                return render(request, 'joinroom.html', context) 
+            
+            if WerewolfSaga.objects.filter(id=roomId,players__id=user.id).exists():
+                context['message'] = '你已经在这个房间里了！'
+                gameList = games.objects.all()
+                context['gameList'] = gameList 
+                return render(request, 'joinroom.html', context) 
+         
+            return render(request, 'werewolfsaga.html', context)
         case _:
             print('没有这个游戏')
             return render(request, 'joinroom.html', context)
