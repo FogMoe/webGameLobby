@@ -114,7 +114,7 @@ class ChatConsumer(WebsocketConsumer):
     def chat_message(self, event):
         message = event['message']
         datetime_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
+        print( message)
         # 通过websocket发送消息到客户端
         self.send(text_data=json.dumps({
             'message': f'({datetime_str}) {message}'
@@ -219,7 +219,7 @@ class WerewolfSagaConsumer(WebsocketConsumer):
         roomPlayer=WerewolfSagaPlayer.objects.filter(werewolfsaga_id=self.roomId)
             
         message = user.username+" : "+text_data_json['message']
-        
+        print(message)
         ##回合0
         if room.round == 0:
             if text_data_json['message'] == 'unready':
@@ -238,14 +238,39 @@ class WerewolfSagaConsumer(WebsocketConsumer):
                     room.save()
 
 
-        
+        ##第一阶段
         if room.round == 1:
+            ##赋予编号
             i=0
             for p in roomPlayer:
                 i+=1
                 p.playernumber = i
                 p.save()
-
+            ##赋予角色
+            if(WerewolfSagaPlayer.objects.filter(playernumber=1,werewolfsaga_id=self.roomId).exists()):
+                r=WerewolfSagaPlayer.objects.get(playernumber=1,werewolfsaga_id=self.roomId)
+                r.role=1
+                r.save()
+            if(WerewolfSagaPlayer.objects.filter(playernumber=2,werewolfsaga_id=self.roomId).exists()):
+                r=WerewolfSagaPlayer.objects.get(playernumber=2,werewolfsaga_id=self.roomId)
+                r.role=2
+                r.save()
+            if(WerewolfSagaPlayer.objects.filter(playernumber=3,werewolfsaga_id=self.roomId).exists()):
+                WerewolfSagaPlayer.objects.get(playernumber=3,werewolfsaga_id=self.roomId)
+                r.role=3
+                r.save()
+            if(WerewolfSagaPlayer.objects.filter(playernumber=4,werewolfsaga_id=self.roomId).exists()):
+                WerewolfSagaPlayer.objects.get(playernumber=4,werewolfsaga_id=self.roomId)
+                r.role=3
+                r.save()
+            if(WerewolfSagaPlayer.objects.filter(playernumber=5,werewolfsaga_id=self.roomId).exists()):
+                WerewolfSagaPlayer.objects.get(playernumber=5,werewolfsaga_id=self.roomId)
+                r.role=3
+                r.save()
+            if(WerewolfSagaPlayer.objects.filter(playernumber=6,werewolfsaga_id=self.roomId).exists()):
+                WerewolfSagaPlayer.objects.get(playernumber=6,werewolfsaga_id=self.roomId)
+                r.role=1
+                r.save()
         # 发送消息到频道组，频道组调用chat_message方法
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
@@ -304,6 +329,8 @@ class WerewolfSagaConsumer(WebsocketConsumer):
                     role='狼人'
                 case 2:
                     role='女巫'
+                case 3:
+                    role='村民'
             onlinelist += str(player.playernumber) +'. '+ u.username +' ('+ps+') '+role+  '\n'
 
         # 通过websocket发送消息到客户端
