@@ -60,31 +60,26 @@ def joinroom(request):
         return render(request, 'joinroom.html', context) 
     match gameId:
         case 1:
-            try:
-                chatRoom=ChatRoom.objects.get(id=roomId) ##获取游戏对象
-            except ObjectDoesNotExist: ##如果没有根据id获取到对象，说明这个房间不存在
+            if not ChatRoom.objects.filter(id=roomId).exists():##如果房间不存在
                 context['message'] = '没有这个房间！'
                 gameList = games.objects.all()
                 context['gameList'] = gameList 
                 return render(request, 'joinroom.html', context) 
-            else:
-                if chatRoom.password == password: 
-                    print('aaaa')
-                    try:##判断是不是已经在房间里了
-                        chatRoom.subscribers.get(id=user.id)
-                    except ObjectDoesNotExist:
-                        return render(request, 'chatroom.html', context)
-                    else:
-                        context['message'] = '你已经在这个房间里了！'
-                        gameList = games.objects.all()
-                        context['gameList'] = gameList 
-                        return render(request, 'joinroom.html', context) 
-                    
-                else:##密码错误时
-                    context['message'] = '密码错误！'
-                    gameList = games.objects.all()
-                    context['gameList'] = gameList 
-                    return render(request, 'joinroom.html', context) 
+            chatRoom=ChatRoom.objects.get(id=roomId)
+            if not chatRoom.password == password: 
+                context['message'] = '密码错误！'
+                gameList = games.objects.all()
+                context['gameList'] = gameList 
+                return render(request, 'joinroom.html', context) 
+            
+            if ChatRoom.objects.filter(subscribers__id=user.id).exists():
+                context['message'] = '你已经在这个房间里了！'
+                gameList = games.objects.all()
+                context['gameList'] = gameList 
+                return render(request, 'joinroom.html', context) 
+         
+            return render(request, 'chatroom.html', context)
+            
         case 2:##狼人杀
             return render(request, 'index.html', context)
         case _:

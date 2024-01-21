@@ -1,5 +1,4 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 import datetime
 from django.contrib.auth.models import User #django自带的User模型
 from django.contrib.auth import authenticate
@@ -29,36 +28,44 @@ def login(request):
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(request,username=username,password=password)
-    if user:
-        user.last_login=datetime.datetime.now()
-        context['message'] = '登录成功~' 
-        context['user'] = user
-        user.save()
-        login_(request, user)
-    else:
-        context['message'] = '┭┮﹏┭┮登录失败惹' 
-    return render(request, 'index.html', context) #对html跳转到index
-    #return HttpResponse("Hello world ! ")
+
+    if not user:
+        context['message'] = '用户名或密码错误~' 
+        return render(request, 'login.html', context) #对html跳转到index
+    
+    user.last_login=datetime.datetime.now()
+    context['message'] = '登录成功~' 
+    context['user'] = user
+    user.save()
+    login_(request, user)
+    return  redirect('index') #重定向到index
+
 def register(request):
     context          = {}
     username = request.POST['username']
     password = request.POST['password']
     email = request.POST['email']
-    if validate_user_input(username,password,email):
-        last_login = datetime.datetime.now()
-        user=User.objects.create_user(username=username,password=password,email=email,last_login=last_login)
-        context['message'] = '注册成功~' 
-        context['user'] = user 
-        login_(request, user)
-    else:
-        context['message'] = '输入错误，请检查~' 
+    
 
-    return render(request, 'index.html', context) #对html跳转到index
-    #return HttpResponse("Hello world ! ")
+    if not validate_user_input(username,password,email):
+        context['message'] = '输入错误，请检查~' 
+        return render(request,'register.html', context) #对html跳转到index
+    
+    if User.objects.filter(username=username).exists():
+        context['message'] = '用户名已存在~' 
+        return render(request,'register.html', context) #对html跳转到index
+    
+    last_login = datetime.datetime.now()
+    user=User.objects.create_user(username=username,password=password,email=email,last_login=last_login)
+    context['message'] = '注册成功~' 
+    context['user'] = user 
+    login_(request, user)
+    return  redirect('index') #重定向到index
+    
 
 def unLogin(request):
     context          = {}
     logout(request)
     context['message'] = '已退出登录' 
-    return render(request, 'index.html', context) #对html跳转到index
+    return  redirect('index') #重定向到index
     #return HttpResponse("Hello world ! ")
