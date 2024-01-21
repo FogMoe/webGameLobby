@@ -33,10 +33,10 @@
         const roomId = JSON.parse(document.getElementById('roomId').textContent);
  
         // 根据roomId拼接websocket请求地址，建立长连接
-        //  请求url地址为/ws/chat/<roomId>/
+        //  请求url地址为/ws/werewolfsaga/<roomId>/
         const wss_protocol = (window.location.protocol == 'https:') ? 'wss://': 'ws://';
         const chatSocket = new WebSocket(
-             wss_protocol + window.location.host + '/ws/chat/'  + roomId + '/'
+             wss_protocol + window.location.host + '/ws/werewolfsaga/'  + roomId + '/'
              );
  
         // 建立websocket连接时触发此方法，展示欢迎提示

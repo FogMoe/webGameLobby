@@ -13,7 +13,7 @@ class games(models.Model):
 class ChatRoom(models.Model):
     name = models.CharField(max_length=255)
     password = models.CharField(max_length=255, null=True, blank=True)
-    subscribers = models.ManyToManyField(User, related_name="chatrooms", blank=True)##玩家
+    players = models.ManyToManyField(User, related_name="chatrooms", blank=True)##玩家
 
     def __str__(self):
         return f"{self.name}"

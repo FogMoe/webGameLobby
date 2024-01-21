@@ -32,7 +32,7 @@ class ChatConsumer(WebsocketConsumer):
  
         room=ChatRoom.objects.get(id=self.roomId)##获取房间对象
         user=self.scope['user']##获取用户对象
-        room.subscribers.add(user) ##房间添加玩家
+        room.players.add(user) ##房间添加玩家
 
         # 将当前频道加入频道组
         async_to_sync(self.channel_layer.group_add)(
@@ -64,9 +64,9 @@ class ChatConsumer(WebsocketConsumer):
         print('websocket断开时执行方法')
         room=ChatRoom.objects.get(id=self.roomId)##获取房间对象
         user=self.scope['user']##获取用户对象
-        room.subscribers.remove(user) ##房间删除玩家
+        room.players.remove(user) ##房间删除玩家
         ##房间无人时删除房间
-        if not(room.subscribers.all().exists()):
+        if not(room.players.all().exists()):
             print('这个房间没人了，删除房间')
             print(room)
             room.delete()
@@ -124,7 +124,7 @@ class ChatConsumer(WebsocketConsumer):
     def onlinelist_message(self, event):
         room=ChatRoom.objects.get(id=self.roomId)
         onlinelist=''
-        for user in room.subscribers.all():
+        for user in room.players.all():
             onlinelist += user.username + '\n'
 
         # 通过websocket发送消息到客户端
@@ -240,10 +240,27 @@ class WerewolfSagaConsumer(WebsocketConsumer):
         room=WerewolfSaga.objects.get(id=self.roomId)
         onlinelist=''
         for user in room.players.all():
-            onlinelist += user.username + '\n'
+            player=WerewolfSagaPlayer.objects.get(player__id=user.id)
+            playerstatus='状态'
+            match player.playerstatus:
+                case 0:
+                    playerstatus='未准备'
+                case 1:
+                    playerstatus='准备'
+                case 2:
+                    playerstatus='死了'
+            role='角色'
+            match player.role:
+                case 0:
+                    role='鹿人'
+                case 1:
+                    role='狼人'
+                case 2:
+                    role='女巫'
+            onlinelist += user.username +' ('+playerstatus+') '+role+  '\n'
 
         # 通过websocket发送消息到客户端
         self.send(text_data=json.dumps({
-            'onlinelist': f'{onlinelist}'
+            'onlinelist': f'{player.playernumber}. {onlinelist}'
         }))
 
