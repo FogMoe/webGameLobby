@@ -1,125 +1,52 @@
 {% load static %}
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="zh">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.108.0">
-    <title>雾萌游戏 - 首页</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>雾萌游戏 - 登录</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sign-in/">
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sign-in/" />
 
-    
+    <link href="{% static 'assets/dist/css/bootstrap.min.css' %}" rel="stylesheet" />
 
-    
-<link href="{% static "assets/dist/css/bootstrap.min.css" %}" rel="stylesheet">
-
-    <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-
-      .b-example-divider {
-        height: 3rem;
-        background-color: rgba(0, 0, 0, .1);
-        border: solid rgba(0, 0, 0, .15);
-        border-width: 1px 0;
-        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
-      }
-
-      .b-example-vr {
-        flex-shrink: 0;
-        width: 1.5rem;
-        height: 100vh;
-      }
-
-      .bi {
-        vertical-align: -.125em;
-        fill: currentColor;
-      }
-
-      .nav-scroller {
-        position: relative;
-        z-index: 2;
-        height: 2.75rem;
-        overflow-y: hidden;
-      }
-
-      .nav-scroller .nav {
-        display: flex;
-        flex-wrap: nowrap;
-        padding-bottom: 1rem;
-        margin-top: -1px;
-        overflow-x: auto;
-        text-align: center;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-      }
-    </style>
-
-    
-    <!-- Custom styles for this template -->
-    <link href="{% static "assets/dist/css/sign-in.css" %}" rel="stylesheet">
+    <link href="{% static 'assets/dist/css/sign-in.css' %}" rel="stylesheet" />
   </head>
   <body class="text-center">
-    
     <main class="form-signin w-100 m-auto">
-      <img class="mb-4" src="{% static "assets/brand/bootstrap-logo.svg" %}" alt="" width="72" height="57">
+      <!--<img class="mb-4" src="{% static 'assets/brand/bootstrap-logo.svg' %}" alt="" width="72" height="57" />-->
       <h1 class="h3 mb-3 fw-normal">雾萌游戏</h1>
       <p>欢迎来到雾萌游戏！</p>
-
 
       <form action="/login/" method="post">
         {% csrf_token %}
 
-        {% if user.username %}<!--已登录-->
+        {% if user.username %}
+          <!-- 已登录 -->
           <a href="/unLogin/" class="w-100 btn btn-lg btn-primary">退出登录</a>
-          <!--<div class="nav">
-            <ul>
-              <li><a href="/toUserCenter/">个人中心</a></li>
-              <li><a href="/toGameList/">游戏列表</a></li>
-              <li><a href="/toGameUpload/">上传游戏</a></li>
-              <li><a href="/toGameManage/">管理游戏</a></li>
-            </ul>
-          </div>-->
-
-
-
-        {% else %}<!--未登录-->
+          <hr class="my-4" />
+          <a href="/index/" class="w-100 btn btn-lg btn-primary">首页</a>
+        {% else %}
+          <!-- 未登录 -->
           <div class="form-floating">
-            <input type="text" class="form-control" name="username" id="floatingInput" placeholder="">
+            <input type="text1" class="form-control" name="username" id="floatingInput" placeholder="" />
             <label for="floatingInput">用户名</label>
           </div>
 
           <div class="form-floating">
-            <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password">
+            <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password" />
             <label for="floatingPassword">密码</label>
           </div>
 
-          <input type="submit" class="w-100 btn btn-lg btn-primary" value="登录">
-          <hr class="my-4">
+          <input type="submit" class="w-100 btn btn-lg btn-primary" value="登录" />
+          <p class="text-danger">{{ message }}</p>
+          <hr class="my-4" />
           <p>没有账号？</p>
           <a href="/toRegister/" class="w-100 btn btn-lg btn-primary">注册</a>
         {% endif %}
-
       </form>
-      
+
       <p class="mt-5 mb-3 text-muted">&copy; COPYRIGHT 2024 FOGMOE</p>
     </main>
-
-
-    
   </body>
 </html>

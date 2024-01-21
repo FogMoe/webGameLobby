@@ -1,29 +1,34 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>雾萌游戏</title>
-</head>
-<body>
-
-    <div name="top">
-        雾萌游戏 
-        {% if user.username   %}
-            {{ user.username }} <a href="/unLogin/"  method="get">退出</a>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>雾萌游戏 - 首页</title>
+    <link href="{% static 'assets/dist/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/dist/css/sign-in.css' %}" rel="stylesheet" />
+  </head>
+  <body class="text-center">
+    <main class="form-signin w-100 m-auto">
+      <h1 class="h3 mb-3 fw-normal">雾萌游戏</h1>
+      <div>
+        {% if user.username %}
+          <p>欢迎, {{ user.username }}!</p>
+          <a href="/unLogin/" class="w-100 btn btn-lg btn-primary">退出</a>
         {% else %}
-            <a href="/toLogin/"  method="get">登录</a>/<a href="/toRegister/"  method="get">注册</a>
+          <a href="/toLogin/" class="w-100 btn btn-lg btn-primary">登录</a>
+          <p>{{ message }}</p>
+          <a href="/toRegister/" class="w-100 btn btn-lg btn-primary">注册</a>
         {% endif %}
-    </div>
+      </div>
 
-    <div name="centre">
-        <p>这里是首页</p>
-        {{ message }}<br/>
-        <a href="/toLobby/">游戏大厅</a>
-    </div>
+      <hr class="my-4" />
+      <p>{{ hello }}</p>
+      <div>
+        <a href="/toLobby/" class="w-100 btn btn-lg btn-primary">游戏大厅</a>
+      </div>
 
-    <div name="bottom">
-        {{ hello }}
-    </div>
-
-</body>
+      <p class="mt-5 mb-3 text-muted">&copy; COPYRIGHT 2024 FOGMOE</p>
+    </main>
+  </body>
 </html>
