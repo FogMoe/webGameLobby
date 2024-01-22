@@ -48,6 +48,7 @@ class WerewolfSagaPlayer(models.Model):
     werewolfsaga = models.ForeignKey(WerewolfSaga, on_delete=models.CASCADE)
     playerstatus = models.IntegerField(default=0)
     playernumber = models.IntegerField(default=0)
+    action = models.IntegerField(default=0)
     role = models.IntegerField(default=0)
 
     def __str__(self):

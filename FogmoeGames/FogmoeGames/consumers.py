@@ -244,41 +244,31 @@ class WerewolfSagaConsumer(WebsocketConsumer):
             i=0
             for p in roomPlayer:
                 i+=1
-                p.playernumber = i
-                p.save()
+                WerewolfSagaPlayer.objects.filter(id=p.id).update(playernumber=i)
+            #让所有玩家活着，并可以行动
+            WerewolfSagaPlayer.objects.filter(werewolfsaga=room).update(playerstatus=2,action=1)
             ##赋予角色
             if(WerewolfSagaPlayer.objects.filter(playernumber=1,werewolfsaga_id=self.roomId).exists()):
                 p=WerewolfSagaPlayer.objects.get(playernumber=1,werewolfsaga_id=self.roomId)
-                p.role=1
-                p.playerstatus = 2
-                p.save()
+                WerewolfSagaPlayer.objects.filter(id=p.id).update(role=1)
             if(WerewolfSagaPlayer.objects.filter(playernumber=2,werewolfsaga_id=self.roomId).exists()):
                 p=WerewolfSagaPlayer.objects.get(playernumber=2,werewolfsaga_id=self.roomId)
-                p.role=2
-                p.playerstatus = 2
-                p.save()
+                WerewolfSagaPlayer.objects.filter(id=p.id).update(role=2)
             if(WerewolfSagaPlayer.objects.filter(playernumber=3,werewolfsaga_id=self.roomId).exists()):
                 p=WerewolfSagaPlayer.objects.get(playernumber=3,werewolfsaga_id=self.roomId)
-                p.role=3
-                p.playerstatus = 2
-                p.save()
+                WerewolfSagaPlayer.objects.filter(id=p.id).update(role=3)
             if(WerewolfSagaPlayer.objects.filter(playernumber=4,werewolfsaga_id=self.roomId).exists()):
                 p=WerewolfSagaPlayer.objects.get(playernumber=4,werewolfsaga_id=self.roomId)
-                p.role=3
-                p.playerstatus = 2
-                p.save()
+                WerewolfSagaPlayer.objects.filter(id=p.id).update(role=3)
             if(WerewolfSagaPlayer.objects.filter(playernumber=5,werewolfsaga_id=self.roomId).exists()):
                 p=WerewolfSagaPlayer.objects.get(playernumber=5,werewolfsaga_id=self.roomId)
-                p.role=3
-                p.playerstatus = 2
-                p.save()
+                WerewolfSagaPlayer.objects.filter(id=p.id).update(role=3)
             if(WerewolfSagaPlayer.objects.filter(playernumber=6,werewolfsaga_id=self.roomId).exists()):
                 p=WerewolfSagaPlayer.objects.get(playernumber=6,werewolfsaga_id=self.roomId)
-                p.role=1
-                p.playerstatus = 2
-                p.save()
-            room.round = 2
-            room.save()
+                WerewolfSagaPlayer.objects.filter(id=p.id).update(role=1)
+
+            WerewolfSaga.objects.filter(id=room.id).update(round=2)
+
             # 给玩家发送信息
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -287,6 +277,7 @@ class WerewolfSagaConsumer(WebsocketConsumer):
                     'message': '现在是晚上，请狼人和女巫鲨鱼人'
                 }
             )
+            
 
         ##第二阶段 游戏真正开始
         if room.round == 2:
@@ -295,26 +286,32 @@ class WerewolfSagaConsumer(WebsocketConsumer):
                     p=WerewolfSagaPlayer.objects.get(playernumber=1,werewolfsaga_id=self.roomId)
                     p.playerstatus = 3
                     p.save()
+                    WerewolfSagaPlayer.objects.filter(id=player.id).update(action=0)#杀死一个人后让用户不能再次杀人
                 case 'killp2':
                     p=WerewolfSagaPlayer.objects.get(playernumber=2,werewolfsaga_id=self.roomId)
                     p.playerstatus = 3
                     p.save()
+                    WerewolfSagaPlayer.objects.filter(id=player.id).update(action=0)#杀死一个人后让用户不能再次杀人
                 case 'killp3':
                     p=WerewolfSagaPlayer.objects.get(playernumber=3,werewolfsaga_id=self.roomId)
                     p.playerstatus = 3
                     p.save()
+                    WerewolfSagaPlayer.objects.filter(id=player.id).update(action=0)#杀死一个人后让用户不能再次杀人
                 case 'killp4':
                     p=WerewolfSagaPlayer.objects.get(playernumber=4,werewolfsaga_id=self.roomId)
                     p.playerstatus = 3
                     p.save()
+                    WerewolfSagaPlayer.objects.filter(id=player.id).update(action=0)#杀死一个人后让用户不能再次杀人
                 case 'killp5':
                     p=WerewolfSagaPlayer.objects.get(playernumber=5,werewolfsaga_id=self.roomId)
                     p.playerstatus = 3
                     p.save()
+                    WerewolfSagaPlayer.objects.filter(id=player.id).update(action=0)#杀死一个人后让用户不能再次杀人
                 case 'killp6':
                     p=WerewolfSagaPlayer.objects.get(playernumber=6,werewolfsaga_id=self.roomId)
                     p.playerstatus = 3
                     p.save()
+                    WerewolfSagaPlayer.objects.filter(id=player.id).update(action=0)#杀死一个人后让用户不能再次杀人
                     
         # 发送消息到频道组，频道组调用chat_message方法
         async_to_sync(self.channel_layer.group_send)(
@@ -355,7 +352,9 @@ class WerewolfSagaConsumer(WebsocketConsumer):
         username=user.username
         round=room.round
         action=room.action
+        playeraction=player.action
         onlinelist=''
+        lifelist=''
         for u in room.players.all():
             player=WerewolfSagaPlayer.objects.get(player__id=u.id,werewolfsaga_id=self.roomId)
             ps='状态'
@@ -379,7 +378,7 @@ class WerewolfSagaConsumer(WebsocketConsumer):
                 case 3:
                     role='村民'
             onlinelist += str(player.playernumber) +'. '+ u.username +' ('+ps+') '+role+  '\n'
-
+            if player.playerstatus==2:lifelist +=str(player.playernumber) +','
         # 通过websocket发送消息到客户端
         self.send(text_data=json.dumps({
             'onlinelist': f'{onlinelist}',
@@ -388,7 +387,9 @@ class WerewolfSagaConsumer(WebsocketConsumer):
             'username': f'{str(username)}',
             'round': f'{str(round)}',
             'playerstatus': f'{str(playerstatus)}',
-            'action': f'{str(action)}'
+            'action': f'{str(action)}',
+            'playeraction': f'{str(playeraction)}',
+            'lifelist': f'{str(lifelist)}'
         }))
 
 
