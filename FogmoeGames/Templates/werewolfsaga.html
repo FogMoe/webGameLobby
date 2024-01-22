@@ -17,17 +17,26 @@
     </div>
 
     <div name="centre">
-        <textarea id="chat-log" cols="100" rows="20"></textarea><br>
-        <input id="chat-message-input" type="text" size="100"><br>
-        <input id="chat-message-submit" type="button" value="Send"><br>
+        <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
+        <input id="chat-message-input" type="text" size="100"/><br/>
+        <input id="chat-message-submit" type="button" value="Send"/><br/>
 
         <div style="display:none" id="round0">
-            <input id="ready" type="button" value="ready">
-            <input id="unready" style="display:none" type="button" value="unready">
+            <input id="ready" type="button" value="ready" />
+            <input id="unready" style="display:none" type="button" value="unready" />
         </div>
 
-        
-        <textarea id="online-list" cols="100" rows="20"></textarea><br>
+        <div style="display:none" id="round2">
+        杀死：
+            <input id="killp1" type="button" value="玩家1" />
+            <input id="killp2" type="button" value="玩家2" />
+            <input id="killp3" type="button" value="玩家3" />
+            <input id="killp4" type="button" value="玩家4" />
+            <input id="killp5" type="button" value="玩家5" />
+            <input id="killp6" type="button" value="玩家6" />
+        </div>
+
+        <textarea id="online-list" cols="100" rows="20"></textarea><br/>
         <p>{{ roomName }}{{ roomId }}</p>
         {{ roomId|json_script:"roomId" }}
     </div>
@@ -53,32 +62,42 @@
  
         // 从后台接收到数据时触发此方法
          chatSocket.onmessage = function(e) {
-             const data = JSON.parse(e.data);
-             //把聊天信息message推送到id为chat-log的控件
-             if ( data.message != undefined ){
-                document.querySelector('#chat-log').value += (data.message + '\n');
-             }
-             //把在线列表onlinelist推送到id为online-list的控件
-             if ( data.onlinelist != undefined ){
+            const data = JSON.parse(e.data);
+
+            //把聊天信息message推送到id为chat-log的控件
+            if ( data.message != undefined ){
+               document.querySelector('#chat-log').value += (data.message + '\n');
+            }
+            //把在线列表onlinelist推送到id为online-list的控件
+            if ( data.onlinelist != undefined ){
                 document.querySelector('#online-list').value = (data.onlinelist);
-             }
-             //rond0没有开始游戏时玩家可以看到的内容
-             if( data.round == 0){
+            }
+
+            //rond0没有开始游戏时玩家可以看到的内容
+            if( data.round == 0){
                 document.querySelector('#round0').style.display = 'block';
-             }else{
+            }else{
                 document.querySelector('#round0').style.display = 'none';
-             }
-             //如果用户没有准备则给准备按钮
-             if ( data.playerstatus == 0 ){
-                document.querySelector('#ready').style.display = 'block';
-                document.querySelector('#unready').style.display = 'none';
-             }
-             //如果用户没有准备则给准备按钮
-             if ( data.playerstatus == 1 ){
-                document.querySelector('#ready').style.display = 'none';
-                document.querySelector('#unready').style.display = 'block';
-             }
-         };
+            }
+                //如果用户没有准备则给准备按钮
+                if ( data.playerstatus == 0 ){
+                    document.querySelector('#ready').style.display = 'block';
+                    document.querySelector('#unready').style.display = 'none';
+                }
+                //如果用户没有准备则给准备按钮
+                if ( data.playerstatus == 1 ){
+                    document.querySelector('#ready').style.display = 'none';
+                    document.querySelector('#unready').style.display = 'block';
+                }
+
+            //rond2狼人和女巫杀人的菜单
+            if( data.round == 2){
+                document.querySelector('#round2').style.display = 'block';
+            }else{
+                document.querySelector('#round2').style.display = 'none';
+            }
+                
+        };
  
          // websocket连接断开时触发此方法
          chatSocket.onclose = function(e) {
@@ -124,6 +143,78 @@
              //注意这里:先把文本数据转成json格式,然后调用send方法发送。
              chatSocket.send(JSON.stringify({
                  'message': message
+             }));
+             messageInputDom.value = '';
+         };
+
+        // 点击killp1时。
+         document.querySelector('#killp1').onclick = function(e) {
+             const messageInputDom = document.querySelector('#chat-message-input');
+             const message = 'killp1';
+             
+             //注意这里:先把文本数据转成json格式,然后调用send方法发送。
+             chatSocket.send(JSON.stringify({
+                 'message': message
+             }));
+             messageInputDom.value = '';
+         };
+         
+        // 点击killp2时。
+         document.querySelector('#killp2').onclick = function(e) {
+             const messageInputDom = document.querySelector('#chat-message-input');
+             const message = 'killp2';
+             
+             //注意这里:先把文本数据转成json格式,然后调用send方法发送。
+             chatSocket.send(JSON.stringify({
+                'message': message
+             }));
+             messageInputDom.value = '';
+         };
+         
+        // 点击killp3时。
+         document.querySelector('#killp3').onclick = function(e) {
+             const messageInputDom = document.querySelector('#chat-message-input');
+             const message = 'killp3';
+             
+             //注意这里:先把文本数据转成json格式,然后调用send方法发送。
+             chatSocket.send(JSON.stringify({
+                'message': message
+             }));
+             messageInputDom.value = '';
+         };
+         
+        // 点击killp4时。
+         document.querySelector('#killp4').onclick = function(e) {
+             const messageInputDom = document.querySelector('#chat-message-input');
+             const message = 'killp4';
+             
+             //注意这里:先把文本数据转成json格式,然后调用send方法发送。
+             chatSocket.send(JSON.stringify({
+               'message': message
+             }));
+             messageInputDom.value = '';
+         };
+         
+        // 点击killp5时。
+         document.querySelector('#killp5').onclick = function(e) {
+             const messageInputDom = document.querySelector('#chat-message-input');
+             const message = 'killp5';
+             
+             //注意这里:先把文本数据转成json格式,然后调用send方法发送。
+             chatSocket.send(JSON.stringify({
+               'message': message
+             }));
+             messageInputDom.value = '';
+         };
+         
+        // 点击killp6时。
+         document.querySelector('#killp6').onclick = function(e) {
+             const messageInputDom = document.querySelector('#chat-message-input');
+             const message = 'killp6';
+             
+             //注意这里:先把文本数据转成json格式,然后调用send方法发送。
+             chatSocket.send(JSON.stringify({
+              'message': message
              }));
              messageInputDom.value = '';
          };

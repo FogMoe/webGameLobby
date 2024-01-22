@@ -238,7 +238,7 @@ class WerewolfSagaConsumer(WebsocketConsumer):
                     room.save()
 
 
-        ##第一阶段
+        ##第一阶段初始化
         if room.round == 1:
             ##赋予编号
             i=0
@@ -248,29 +248,74 @@ class WerewolfSagaConsumer(WebsocketConsumer):
                 p.save()
             ##赋予角色
             if(WerewolfSagaPlayer.objects.filter(playernumber=1,werewolfsaga_id=self.roomId).exists()):
-                r=WerewolfSagaPlayer.objects.get(playernumber=1,werewolfsaga_id=self.roomId)
-                r.role=1
-                r.save()
+                p=WerewolfSagaPlayer.objects.get(playernumber=1,werewolfsaga_id=self.roomId)
+                p.role=1
+                p.playerstatus = 2
+                p.save()
             if(WerewolfSagaPlayer.objects.filter(playernumber=2,werewolfsaga_id=self.roomId).exists()):
-                r=WerewolfSagaPlayer.objects.get(playernumber=2,werewolfsaga_id=self.roomId)
-                r.role=2
-                r.save()
+                p=WerewolfSagaPlayer.objects.get(playernumber=2,werewolfsaga_id=self.roomId)
+                p.role=2
+                p.playerstatus = 2
+                p.save()
             if(WerewolfSagaPlayer.objects.filter(playernumber=3,werewolfsaga_id=self.roomId).exists()):
-                WerewolfSagaPlayer.objects.get(playernumber=3,werewolfsaga_id=self.roomId)
-                r.role=3
-                r.save()
+                p=WerewolfSagaPlayer.objects.get(playernumber=3,werewolfsaga_id=self.roomId)
+                p.role=3
+                p.playerstatus = 2
+                p.save()
             if(WerewolfSagaPlayer.objects.filter(playernumber=4,werewolfsaga_id=self.roomId).exists()):
-                WerewolfSagaPlayer.objects.get(playernumber=4,werewolfsaga_id=self.roomId)
-                r.role=3
-                r.save()
+                p=WerewolfSagaPlayer.objects.get(playernumber=4,werewolfsaga_id=self.roomId)
+                p.role=3
+                p.playerstatus = 2
+                p.save()
             if(WerewolfSagaPlayer.objects.filter(playernumber=5,werewolfsaga_id=self.roomId).exists()):
-                WerewolfSagaPlayer.objects.get(playernumber=5,werewolfsaga_id=self.roomId)
-                r.role=3
-                r.save()
+                p=WerewolfSagaPlayer.objects.get(playernumber=5,werewolfsaga_id=self.roomId)
+                p.role=3
+                p.playerstatus = 2
+                p.save()
             if(WerewolfSagaPlayer.objects.filter(playernumber=6,werewolfsaga_id=self.roomId).exists()):
-                WerewolfSagaPlayer.objects.get(playernumber=6,werewolfsaga_id=self.roomId)
-                r.role=1
-                r.save()
+                p=WerewolfSagaPlayer.objects.get(playernumber=6,werewolfsaga_id=self.roomId)
+                p.role=1
+                p.playerstatus = 2
+                p.save()
+            room.round = 2
+            room.save()
+            # 给玩家发送信息
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': '现在是晚上，请狼人和女巫鲨鱼人'
+                }
+            )
+
+        ##第二阶段 游戏真正开始
+        if room.round == 2:
+            match text_data_json['message']:
+                case 'killp1':
+                    p=WerewolfSagaPlayer.objects.get(playernumber=1,werewolfsaga_id=self.roomId)
+                    p.playerstatus = 3
+                    p.save()
+                case 'killp2':
+                    p=WerewolfSagaPlayer.objects.get(playernumber=2,werewolfsaga_id=self.roomId)
+                    p.playerstatus = 3
+                    p.save()
+                case 'killp3':
+                    p=WerewolfSagaPlayer.objects.get(playernumber=3,werewolfsaga_id=self.roomId)
+                    p.playerstatus = 3
+                    p.save()
+                case 'killp4':
+                    p=WerewolfSagaPlayer.objects.get(playernumber=4,werewolfsaga_id=self.roomId)
+                    p.playerstatus = 3
+                    p.save()
+                case 'killp5':
+                    p=WerewolfSagaPlayer.objects.get(playernumber=5,werewolfsaga_id=self.roomId)
+                    p.playerstatus = 3
+                    p.save()
+                case 'killp6':
+                    p=WerewolfSagaPlayer.objects.get(playernumber=6,werewolfsaga_id=self.roomId)
+                    p.playerstatus = 3
+                    p.save()
+                    
         # 发送消息到频道组，频道组调用chat_message方法
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
@@ -320,6 +365,8 @@ class WerewolfSagaConsumer(WebsocketConsumer):
                 case 1:
                     ps='准备'
                 case 2:
+                    ps='没死'
+                case 3:
                     ps='死了'
             role='角色'
             match player.role:
