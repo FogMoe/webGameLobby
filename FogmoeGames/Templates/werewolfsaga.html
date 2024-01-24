@@ -18,9 +18,10 @@
 
     <div name="centre">
         <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
+        <div id="baitian">
         <input id="chat-message-input" type="text" size="100"/><br/>
         <input id="chat-message-submit" type="button" value="Send"/><br/>
-
+        </div>
         <div style="display:none" id="round0">
             <input id="ready" type="button" value="ready" />
             <input id="unready" style="display:none" type="button" value="unready" />
@@ -38,6 +39,7 @@
 
         <textarea id="online-list" cols="100" rows="20"></textarea><br/>
         <p>{{ roomName }}{{ roomId }}</p>
+        <div id='timer'></div>
         {{ roomId|json_script:"roomId" }}
     </div>
 
@@ -54,7 +56,6 @@
         const chatSocket = new WebSocket(
              wss_protocol + window.location.host + '/ws/werewolfsaga/'  + roomId + '/'
              );
- 
         // 建立websocket连接时触发此方法，展示欢迎提示
         chatSocket.onopen = function(e) {
              document.querySelector('#chat-log').value += ('[公告]' + roomId + '号房间连接成功~\n')
@@ -90,11 +91,19 @@
                     document.querySelector('#unready').style.display = 'block';
                 }
 
-            //rond2狼人和女巫杀人的菜单
-            if( data.round == 2 && data.playeraction == 1){
+            //显示投票杀人按钮
+            if( ( data.round == 2 || data.round == 4 ) && data.playeraction == 1){
                 document.querySelector('#round2').style.display = 'block';
             }else{
                 document.querySelector('#round2').style.display = 'none';
+                if( data.round == 2 || data.round == 4 ) startTimer();
+            }
+            //显示聊天框
+            if( (data.round == 4 || data.round == 0) && data.playerstatus != 3 ){
+                document.querySelector('#baitian').style.display = 'block';
+                if( data.round == 4 && data.playerstatus != 3 ) startTimer();
+            }else{
+                document.querySelector('#baitian').style.display = 'none';
             }
                 
         };
@@ -218,6 +227,14 @@
              }));
              messageInputDom.value = '';
          };
+        // 定义结束时要调用的函数
+        function onTimerEnd() {
+            chatSocket.send(JSON.stringify({'message': 'Round Over'}));
+            timerElement.innerText = "";
+        };
+
+
+        
     </script>
 </body>
 </html>
