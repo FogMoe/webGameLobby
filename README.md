@@ -1,8 +1,9 @@
 # FogMoe-webGameLobby
+待补充~
 
 ## 从环境搭建到启动服务端
 
-[下載安裝python](https://www.python.org/downloads/release/python-3121/)
+[下载安裝python](https://www.python.org/downloads/release/python-3121/)
 
 ### 安裝库
 ```python
