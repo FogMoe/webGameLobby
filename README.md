@@ -36,8 +36,13 @@ python manage.py migrate # 创建表结构
 ```
 
 ### 添加默认数据
+[INSERT](http://localhost/phpMyAdmin4.8.5/url.php?url=https://dev.mysql.com/doc/refman/5.5/en/insert.html)
 ```sql
-[INSERT](http://localhost/phpMyAdmin4.8.5/url.php?url=https://dev.mysql.com/doc/refman/5.5/en/insert.html) INTO `models_games` (`id`, `name`, `playerNum`) [VALUES](http://localhost/phpMyAdmin4.8.5/url.php?url=https://dev.mysql.com/doc/refman/5.5/en/miscellaneous-functions.html#function_values) (NULL, '聊天室', '100'), (NULL, '狼人杀', '6')
+ INTO `models_games` (`id`, `name`, `playerNum`)
+```
+ [VALUES](http://localhost/phpMyAdmin4.8.5/url.php?url=https://dev.mysql.com/doc/refman/5.5/en/miscellaneous-functions.html#function_values)
+```sql
+ (NULL, '聊天室', '100'), (NULL, '狼人杀', '6')
 ```
 
 ### 修改settings.py中的hosts
