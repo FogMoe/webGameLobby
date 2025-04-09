@@ -1,0 +1,5 @@
+Django==5.0.1
+PyMySQL
+channels
+daphne
+python-dotenv 

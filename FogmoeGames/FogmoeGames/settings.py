@@ -12,40 +12,44 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 # -*- coding: UTF-8 -*
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(os.path.join(BASE_DIR, '..', '.env')) # 加载 .env 文件
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-nxe7&vea)4p01l4&059fc$%8o6eslbf#i#e&0c584k(0xn4f)d'
+SECRET_KEY = 'django-insecure-p^=)60*w$w5z13$z@4v_e8g7g%f36!b=5q^j=x5@c_z$_o#7%)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels', # channels应用
     'Models',
+    'FogmoeGames',
 ]
- # 设置ASGI应用
+
+# 设置ASGI应用
 ASGI_APPLICATION = 'FogmoeGames.asgi.application'
- 
- # 设置通道层的通信后台 - 本地测试用
+
+# 设置通道层的通信后台 - 本地测试用
 CHANNEL_LAYERS = {
     'default': {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
@@ -88,12 +92,12 @@ WSGI_APPLICATION = 'FogmoeGames.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',    # 数据库引擎
-        'NAME': 'FogmoeGames', # 数据库名称
-        'HOST': '127.0.0.1', # 数据库地址，本机 ip 地址 127.0.0.1 
-        'PORT': 3306, # 端口 
-        'USER': 'admin',  # 数据库用户名
-        'PASSWORD': '123456', # 数据库密码
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),    # 数据库引擎
+        'NAME': os.getenv('DB_NAME', 'FogmoeGames'), # 数据库名称
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'), # 数据库地址，本机 ip 地址 127.0.0.1 
+        'PORT': os.getenv('DB_PORT', 3306), # 端口 
+        'USER': os.getenv('DB_USER', 'admin'),  # 数据库用户名
+        'PASSWORD': os.getenv('DB_PASSWORD', '123456'), # 数据库密码
     }
 }
 
